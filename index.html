@@ -305,6 +305,29 @@
     main{padding:7px}.link-button{font-size:15px}.counter-box{font-size:13px}
   }
   @media(prefers-reduced-motion:reduce){.blink,.moving-title,.moving-title h1,.sparkle-row,.marquee-text,.rainbow-line,.section h2,body::before,.kiriban-overlay,.kiriban-card,.confetti-piece{animation:none}}
+
+
+  /* ランダムチャレンジくじ */
+  .challenge-lottery{margin:13px 0;padding:10px;text-align:center;border:5px ridge #ffcc00;background:repeating-linear-gradient(135deg,#fff8b8 0,#fff8b8 12px,#fff 12px,#fff 24px);box-shadow:5px 5px 0 #ff66cc}
+  .challenge-lottery h2{margin:0 0 8px;padding:6px;color:#ffff00;background:linear-gradient(90deg,#cc0000,#ff00cc,#cc0000);border:3px outset #ff99ff;font-size:20px;text-shadow:2px 2px #000}
+  .slot-window{min-height:62px;display:flex;align-items:center;justify-content:center;margin:10px 0;padding:10px;overflow:hidden;color:#000066;background:#fff;border:5px inset #ccc;font-size:clamp(17px,4.5vw,23px);font-weight:bold}
+  .slot-window.spinning{color:#ff0066;animation:slotFlash .15s steps(2,end) infinite}
+  @keyframes slotFlash{50%{color:#0000ff;background:#ffff99}}
+  .lottery-button,.challenge-go{margin:5px;padding:9px 17px;border:4px outset #fff;font:bold 16px "MS PGothic","Yu Gothic",sans-serif;cursor:pointer}
+  .lottery-button{color:#fff;background:linear-gradient(#ff3399,#cc0066)}
+  .lottery-button:active,.challenge-go:active{border-style:inset}
+  .lottery-button:disabled{color:#ddd;background:#888;cursor:wait}
+  .challenge-go{display:none;color:#000;background:linear-gradient(#ffff66,#ff9900);text-decoration:none}
+  .challenge-go.show{display:inline-block;animation:challengePop .4s ease-out}
+  @keyframes challengePop{from{transform:scale(.6)}to{transform:scale(1)}}
+  .lottery-note{margin:5px 0 0;color:#990066;font-size:12px;font-weight:bold}
+
+  /* キリ番報告ボタン */
+  .kiriban-bbs{display:inline-block;margin:5px;padding:10px 18px;color:#fff;background:linear-gradient(#00aaff,#0033cc);border:5px outset #fff;font:bold 17px "MS PGothic",sans-serif;text-decoration:none}
+  .kiriban-bbs:active{border-style:inset}
+  /* フッターの隠しリンク。見た目は周囲の文字と同じ */
+  .secret-bbs-link{color:inherit;text-decoration:none;cursor:text}
+
 </style>
 </head>
 <body>
@@ -316,6 +339,7 @@
     <h2 id="kiribanTitle" class="mega">祝！キリ番！</h2>
     <div id="kiribanNumber" class="number">10000</div>
     <p>おめでとうございます！<br>記念すべきキリ番を踏みました！</p>
+    <a id="kiribanBbs" class="kiriban-bbs" href="https://mathmachine0725.github.io/Math_portal/bbs.html" target="_blank" rel="noopener noreferrer">掲示板でキリ番報告！</a>
     <button id="kiribanClose" class="kiriban-close" type="button">ホームページに入る</button>
   </div>
 </div>
@@ -335,6 +359,14 @@
   <main>
     <div class="marquee-box" aria-label="お知らせ"><span class="marquee-text">★☆★ 数学を楽しむための教材を公開中！ ゆっくりみていってね！ ★☆★</span></div>
     <div class="notice"><span class="blink">NEW!</span> 教材は随時追加予定です。お気に入り登録してね！</div>
+
+    <section class="challenge-lottery" aria-labelledby="lotteryTitle">
+      <h2 id="lotteryTitle">★ 運命の数学チャレンジ ★</h2>
+      <div id="slotWindow" class="slot-window" aria-live="polite">ボタンを押して今日の修行を決めよう！</div>
+      <button id="lotteryButton" class="lottery-button" type="button">★ くじを引く！ ★</button>
+      <a id="challengeGo" class="challenge-go" href="#">▶ この問題に挑戦！</a>
+      <p class="lottery-note">※基礎練習の中からランダムで1つ選ばれます。</p>
+    </section>
 
     <section class="section">
       <h2>◆ 基礎練習 ◆</h2>
@@ -377,7 +409,7 @@
 
   <div class="rainbow-line" aria-hidden="true"></div>
   <footer>
-    <div>無断リンク大歓迎！</div>
+    <div>無断リンク大歓迎<a class="secret-bbs-link" href="https://mathmachine0725.github.io/Math_portal/bbs.html" target="_blank" rel="noopener noreferrer" aria-label="掲示板">！</a></div>
     <div class="best-view">このサイトは 800×600 以上・最新ブラウザで動作確認しています。</div>
     <div>Copyright © 2026 数学教材ポータル All Rights Reserved.</div>
   </footer>
@@ -418,7 +450,9 @@
   if (isKiriban) {
     const overlay = document.getElementById('kiribanOverlay');
     const closeButton = document.getElementById('kiribanClose');
+    const bbsButton = document.getElementById('kiribanBbs');
     const number = document.getElementById('kiribanNumber');
+    bbsButton.href = 'https://mathmachine0725.github.io/Math_portal/bbs.html?kiriban=' + encodeURIComponent(visits);
     const confetti = document.getElementById('confetti');
     number.textContent = visits.toLocaleString('ja-JP');
 
@@ -444,6 +478,44 @@
     closeButton.addEventListener('click', closeKiriban);
     overlay.addEventListener('click', event => { if (event.target === overlay) closeKiriban(); });
     document.addEventListener('keydown', event => { if (event.key === 'Escape') closeKiriban(); });
+  }
+
+
+  /* 基礎練習ランダムチャレンジ */
+  const challenges = [
+    {title:'座標ゲーム',url:'https://mathmachine0725.github.io/ZAHYOU/pointP_coordinate_game_master.html'},
+    {title:'座標ゲーム（タップ版）',url:'https://mathmachine0725.github.io/ZAHYOU/zahyou_tap.html'},
+    {title:'1次関数ゲーム（タップ版）',url:'https://mathmachine0725.github.io/ZAHYOU/1117_%EF%BC%91%E6%AC%A1%E9%96%A2%E6%95%B0_%E3%82%BF%E3%83%83%E3%83%97%E7%89%88.html'},
+    {title:'1次関数ゲーム（ドロップダウン版）',url:'https://mathmachine0725.github.io/ZAHYOU/1117_%EF%BC%91%E6%AC%A1%E9%96%A2%E6%95%B0_%E3%83%89%E3%83%AD%E3%83%83%E3%83%97%E3%83%80%E3%82%A6%E3%83%B3%E7%89%88.html'},
+    {title:'y=ax² のグラフづくりゲーム',url:'https://mathmachine0725.github.io/ZAHYOU/square_grid_ax^2.html'}
+  ];
+  const lotteryButton=document.getElementById('lotteryButton');
+  const slotWindow=document.getElementById('slotWindow');
+  const challengeGo=document.getElementById('challengeGo');
+  if(lotteryButton&&slotWindow&&challengeGo){
+    lotteryButton.addEventListener('click',()=>{
+      lotteryButton.disabled=true;
+      lotteryButton.textContent='抽選中……！';
+      challengeGo.classList.remove('show');
+      challengeGo.removeAttribute('href');
+      slotWindow.classList.add('spinning');
+      let count=0;
+      const slotTimer=setInterval(()=>{
+        const preview=challenges[Math.floor(Math.random()*challenges.length)];
+        slotWindow.textContent=`？？ ${preview.title} ？？`;
+        count+=1;
+        if(count>=20){
+          clearInterval(slotTimer);
+          const selected=challenges[Math.floor(Math.random()*challenges.length)];
+          slotWindow.classList.remove('spinning');
+          slotWindow.textContent=`★ ${selected.title} に決定！ ★`;
+          challengeGo.href=selected.url;
+          challengeGo.classList.add('show');
+          lotteryButton.disabled=false;
+          lotteryButton.textContent='★ もう一度引く！ ★';
+        }
+      },90);
+    });
   }
 
   /* タイトルを画面内の左端から右端まで、約3.2秒でゆったり往復 */
