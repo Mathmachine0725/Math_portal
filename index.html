@@ -328,9 +328,34 @@
   /* フッターの隠しリンク。見た目は周囲の文字と同じ */
   .secret-bbs-link{color:inherit;text-decoration:none;cursor:text}
 
+
+
+  /* アクセスカウンター・リセット確認 */
+  .counter-reset-overlay{position:fixed;inset:0;z-index:6000;display:none;place-items:center;padding:16px;background:rgba(0,0,40,.72)}
+  .counter-reset-overlay.show{display:grid}
+  .counter-reset-card{width:min(440px,100%);padding:16px;text-align:center;color:#000;border:6px ridge #66ccff;background:#fff;box-shadow:0 0 20px #00ffff}
+  .counter-reset-card h2{margin:0 0 10px;color:#000099;font-size:21px}
+  .counter-reset-card p{line-height:1.6}
+  .counter-reset-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-top:14px}
+  .counter-reset-cancel{padding:9px 22px;color:#000;background:#ffff66;border:4px outset #fff;font:bold 16px "MS PGothic",sans-serif;cursor:pointer}
+  .counter-reset-delete{padding:4px 8px;color:#666;background:#eee;border:2px outset #ddd;font:11px "MS PGothic",sans-serif;cursor:pointer}
+  .counter-reset-cancel:active,.counter-reset-delete:active{border-style:inset}
+
 </style>
 </head>
 <body>
+
+<div id="counterResetOverlay" class="counter-reset-overlay" role="dialog" aria-modal="true" aria-labelledby="counterResetTitle" aria-describedby="counterResetDescription">
+  <div class="counter-reset-card">
+    <h2 id="counterResetTitle">アクセスカウンターのリセット</h2>
+    <p id="counterResetDescription">このブラウザに保存されているアクセス数をリセットしますか？<br>次回の表示は初期値付近から始まります。</p>
+    <div class="counter-reset-actions">
+      <button id="counterResetCancel" class="counter-reset-cancel" type="button">消さない</button>
+      <button id="counterResetDelete" class="counter-reset-delete" type="button">消す</button>
+    </div>
+  </div>
+</div>
+
 
 <div id="kiribanOverlay" class="kiriban-overlay" role="dialog" aria-modal="true" aria-labelledby="kiribanTitle">
   <div id="confetti" aria-hidden="true"></div>
@@ -446,6 +471,52 @@
     span.textContent = char;
     counter.appendChild(span);
   }
+
+
+
+  /* カウンターを10秒以内に3回クリックするとリセット確認を表示 */
+  const counterResetOverlay = document.getElementById('counterResetOverlay');
+  const counterResetCancel = document.getElementById('counterResetCancel');
+  const counterResetDelete = document.getElementById('counterResetDelete');
+  let counterTapCount = 0;
+  let firstCounterTapAt = 0;
+
+  function closeCounterReset() {
+    counterResetOverlay.classList.remove('show');
+    document.body.style.overflow = '';
+    counterTapCount = 0;
+    firstCounterTapAt = 0;
+  }
+
+  counter.style.cursor = 'pointer';
+  counter.addEventListener('click', () => {
+    const now = Date.now();
+    if (!firstCounterTapAt || now - firstCounterTapAt > 10000) {
+      firstCounterTapAt = now;
+      counterTapCount = 1;
+      return;
+    }
+    counterTapCount += 1;
+    if (counterTapCount >= 3) {
+      counterTapCount = 0;
+      firstCounterTapAt = 0;
+      counterResetOverlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      counterResetCancel.focus();
+    }
+  });
+
+  counterResetCancel.addEventListener('click', closeCounterReset);
+  counterResetDelete.addEventListener('click', () => {
+    try { localStorage.removeItem(key); } catch (e) {}
+    location.reload();
+  });
+  counterResetOverlay.addEventListener('click', event => {
+    if (event.target === counterResetOverlay) closeCounterReset();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && counterResetOverlay.classList.contains('show')) closeCounterReset();
+  });
 
   if (isKiriban) {
     const overlay = document.getElementById('kiribanOverlay');
