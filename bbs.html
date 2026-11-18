@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学の館★キリ番報告BBS</title>
+<style>
+  *{box-sizing:border-box}
+  html{background:#000066}
+  body{
+    margin:0;
+    color:#000;
+    background:
+      radial-gradient(circle at 20% 10%,rgba(255,255,0,.35) 0 2px,transparent 3px),
+      radial-gradient(circle at 80% 30%,rgba(0,255,255,.35) 0 2px,transparent 3px),
+      #000066;
+    background-size:42px 42px,55px 55px,auto;
+    font-family:"MS PGothic","Yu Gothic",sans-serif;
+  }
+  a{color:#0000ee}
+  .page{
+    width:min(780px,calc(100% - 12px));
+    margin:8px auto 24px;
+    padding:8px;
+    border:7px ridge #ffcc00;
+    background:#ccffff;
+    box-shadow:0 0 18px #00ffff;
+  }
+  header{text-align:center;border:4px outset #fff;background:linear-gradient(90deg,#000080,#cc00cc,#000080);padding:8px}
+  h1{margin:0;color:#ffff00;font-size:clamp(25px,7vw,45px);text-shadow:3px 3px #f00,-2px -2px #00f;letter-spacing:.05em}
+  .subtitle{margin:5px 0 0;color:#fff;font-weight:bold}
+  .marquee{margin:8px 0;border:3px inset #bbb;background:#000;color:#39ff14;overflow:hidden;white-space:nowrap}
+  .marquee span{display:inline-block;padding:5px 0;animation:flow 13s linear infinite}
+  @keyframes flow{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+  .kiriban-banner{
+    display:none;margin:9px 0;padding:10px;text-align:center;color:#fff;
+    border:5px ridge #ffff00;background:linear-gradient(135deg,#f00,#f0f,#00f);
+    font-weight:bold;font-size:clamp(17px,5vw,24px);text-shadow:2px 2px #000;
+  }
+  .kiriban-banner.show{display:block;animation:flash .7s steps(2,end) 5}
+  @keyframes flash{50%{filter:hue-rotate(120deg);transform:scale(1.01)}}
+  .panel{margin:10px 0;border:4px ridge #999;background:#fff;padding:9px}
+  .panel h2{margin:-9px -9px 9px;padding:5px;color:#fff;background:#000080;font-size:18px;text-align:center}
+  .rules{font-size:13px;line-height:1.6;background:#ffffcc;border:2px dotted #f00;padding:7px}
+  form label{display:block;margin-top:8px;color:#000066;font-weight:bold}
+  input,textarea{width:100%;padding:8px;border:3px inset #ccc;background:#fff;font:16px inherit}
+  textarea{min-height:92px;resize:vertical}
+  .count-row{text-align:right;color:#666;font-size:12px}
+  .submit-button,.back-button,.clear-button{
+    display:inline-block;margin:8px 4px 0;padding:8px 15px;border:4px outset #fff;
+    font:bold 15px inherit;text-decoration:none;cursor:pointer
+  }
+  .submit-button{color:#fff;background:linear-gradient(#ff3399,#990066)}
+  .back-button{color:#000;background:#ffff66}
+  .clear-button{color:#fff;background:#666;font-size:12px;padding:5px 9px}
+  button:active,.back-button:active{border-style:inset}
+  .status{min-height:1.6em;margin-top:5px;color:#cc0000;font-weight:bold;text-align:center}
+  .thread-title{margin:14px 0 6px;padding:6px;text-align:center;color:#ffff00;background:#990066;border:4px outset #ff99cc;font-weight:bold}
+  .post{margin:8px 0;border:2px solid #6699cc;background:#eefaff}
+  .post-head{padding:5px;background:#bbddff;border-bottom:1px solid #6699cc;font-size:13px}
+  .post-no{color:#990000;font-weight:bold}
+  .post-name{color:#006600;font-weight:bold}
+  .post-body{padding:10px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+  .reply{margin:0 8px 9px 30px;border:2px solid #ff99cc;background:#fff0fa}
+  .reply-head{padding:4px 7px;color:#990066;background:#ffd9ee;font-weight:bold;font-size:13px}
+  .reply-body{padding:8px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+  .waiting{color:#777;font-style:italic}
+  footer{margin-top:14px;padding:8px;text-align:center;color:#fff;background:#000080;font-size:12px}
+  .tiny{font-size:11px;color:#555}
+  @media(max-width:480px){.page{width:100%;margin:0;border-width:4px}.reply{margin-left:15px}.submit-button,.back-button{width:100%;margin:5px 0}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>★ キリ番報告BBS ★</h1>
+    <p class="subtitle">踏んだらカキコ！ 踏み逃げもまあ許す！</p>
+  </header>
+
+  <div class="marquee"><span>◆◇◆ キリ番報告・数学の感想・ひとこと大歓迎！ 管理人からレスがつきます♪ ◆◇◆</span></div>
+
+  <div id="kiribanBanner" class="kiriban-banner" aria-live="polite"></div>
+
+  <section class="panel">
+    <h2>■ 書き込みフォーム ■</h2>
+    <div class="rules">
+      ・名前とメッセージを入力して「カキコする」を押してください。<br>
+      ・キリ番ページから来た場合、踏んだ番号が自動で記録されます。<br>
+      ・このBBSは疑似掲示板です。書き込みはこのブラウザの中だけに保存されます。<br>
+      ・偶然見つけたあなた、幸運ですね。解析してたどり着いたあなた、さすがです。<br>
+      ・再訪したい場合は、ポータルサイトの一番下にある「無断リンク大歓迎！」の「！」をクリックすれば、また来られます。ｺｯｿﾘ
+    </div>
+    <form id="postForm" novalidate>
+      <label for="nameInput">お名前</label>
+      <input id="nameInput" name="name" maxlength="20" autocomplete="nickname" placeholder="例：数学太郎">
+
+      <label for="messageInput">メッセージ</label>
+      <textarea id="messageInput" name="message" maxlength="160" required placeholder="キリ番報告やひとことをどうぞ！"></textarea>
+      <div class="count-row"><span id="charCount">0</span> / 160文字</div>
+
+      <button class="submit-button" type="submit">★ カキコする ★</button>
+      <a class="back-button" href="https://mathmachine0725.github.io/Math_portal/">ポータルへ戻る</a>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <div class="thread-title">▼ 最新の書き込み ▼</div>
+  <main id="posts" aria-live="polite"></main>
+
+  <p class="tiny">※投稿と返信は、同じ端末・同じブラウザでのみ表示されます。別の人の端末とは共有されません。</p>
+  <footer>
+    数学の館・キリ番報告BBS<br>
+    Since 2026 / 管理人：数学の館管理人
+  </footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORAGE_POSTS = 'mathPortalBbsPosts_v2';
+  const STORAGE_COUNTS = 'mathPortalBbsNameCounts_v2';
+  const STORAGE_FIRST_OPEN = 'mathPortalBbsSeeded_v2';
+
+  const normalReplies = [
+    '{name}さん、{number}番GETおめでとうございます！！ 報告ありがと～♪',
+    'おおっ、{name}さんが見事に{number}番を踏みましたね！ おめでとうございます＞＜',
+    '祝・{number}HIT！！ 記念カキコありがとうございます！',
+    '{number}番の報告、確かに受け取りました！ 次は{next}番を狙ってね♪',
+    '管理人もびっくり！ {name}さん、{number}番GETおめでとうございます！！',
+    'ようこそキリ番の世界へ……。{number}番を踏んだ{name}さんに幸あれ！',
+    '{number}番、お見事です！ 踏み逃げせずに報告してくれてありがたや～。',
+    'キリ番報告キターーー！！ {name}さん、{number}番、本当におめでとう！',
+    'Congratulations！ {name}さんは記念すべき{number}番目のお客様です！',
+    '{number}番の足あと、しっかり刻まれました！ また遊びに来てくださいね、{name}さん。'
+  ];
+  const heiseiReplies = [
+    '{number}番踏み踏みおめで㌧！！ {name}さん、これからも当サイトをヨロシクです☆',
+    'キリ番ｷﾀ━━━━(ﾟ∀ﾟ)━━━━!! {number}番おめでとうございます！',
+    '{name}さん、{number}番GETだぜ！！ キリ番ハンター認定しますた。',
+    'カキコありがとうございますm(_ _)m　{number}番おめでとうございます♪',
+    '{number}番とは……{name}さん、なかなかやりますな（￣ー￣）ﾆﾔﾘ',
+    '祝☆{number}番！！ 記念に管理人から拍手を送ります。ﾊﾟﾁﾊﾟﾁﾊﾟﾁ',
+    '{number}HITの瞬間を見届けました！ {name}さん、これからもゆっくりしていってね！！',
+    '踏み逃げ禁止……と言いたいところですが、報告してくれたので満点です！ {number}番おめでとう！'
+  ];
+  const mathReplies = [
+    '{number}は美しいキリのよい数ですね。{name}さん、キリ番GETおめでとうございます！',
+    '{number}番到達！ {name}さんの数学運は現在、右肩上がりです。',
+    '{name}さんが{number}番を踏む確率を見事に引き当てました！ これはもう数学的奇跡です。',
+    '座標平面で表すなら、今日の{name}さんは幸運の点Pです！ {number}番おめでとう！',
+    '{number}番GET！ この喜びは一次関数では表せないほど急上昇中です。',
+    '{number}番を踏んだ{name}さんの数学力は、放物線のように上昇するでしょう！',
+    '計算によると、{number}番を踏んだ人には数学マスターになる可能性があります。たぶん。'
+  ];
+  const rareReplies = [
+    '……まさか、本当に{number}番を踏む者が現れるとは。{name}さん、あなたはいったい……。',
+    '{number}番の扉が開かれました。選ばれしキリ番ハンター、{name}さんよ、ようこそ。',
+    'この書き込みは、{number}番を踏んだ者として永久に語り継がれるでしょう……このブラウザ内で。',
+    '管理人は今、{name}さんによる{number}番GETの衝撃で言葉を失っています。しばらくお待ちください。',
+    '{number}番……おめでとうございます。ところで{name}さんは、この掲示板の秘密に気づきましたか？'
+  ];
+
+
+  /* キリ番なしで訪れた人への無難な返信20種類 */
+  const neutralReplies = [
+    '書き込みありがとうございます、{name}さん！ また気軽に遊びに来てくださいね。',
+    '{name}さん、カキコありがとうございます♪ ゆっくりしていってください！',
+    'メッセージありがとうございます！ これからも少しずつ更新していきます。',
+    '{name}さんの足あと、しっかり確認しました。ご訪問ありがとうございます！',
+    '掲示板への書き込みありがとうございます。またのお越しをお待ちしています♪',
+    'カキコありがとうございます！ 数学のゲームもぜひ遊んでみてくださいね。',
+    '{name}さん、ようこそ数学の館へ！ 楽しんでもらえたらうれしいです。',
+    'メッセージを残してくれてありがとうございます。管理人の励みになります！',
+    'ご訪問ありがとうございます！ 気になる教材があればぜひ挑戦してみてください。',
+    '{name}さん、書き込みありがとうございます。次回のご訪問もお待ちしています！',
+    '足あとカキコありがとうございます♪ また何か見つけたら教えてくださいね。',
+    '掲示板をのぞいてくれてありがとうございます。どうぞごゆっくり！',
+    '{name}さんの書き込み、確かに受け取りました！ ありがとうございます。',
+    'メッセージありがとうございます♪ 今日もよい数学日和になりますように。',
+    '書き込みうれしいです！ またいつでもカキコしてくださいね。',
+    '{name}さん、ご来訪ありがとうございます。ポータルの探検もお楽しみください！',
+    'カキコありがとうございます！ 次の更新も気長にお待ちくださいませ。',
+    '掲示板に立ち寄ってくれてありがとうございます。数学の館を今後ともよろしくです！',
+    '{name}さん、メッセージありがとうございます♪ また遊びに来てください。',
+    'ご訪問と書き込みに感謝です！ これからも当サイトをよろしくお願いします。'
+  ];
+
+  const openingByCount = {
+    first: [
+      '初めてのキリ番報告、ありがとうございます！',
+      '初キリ番おめでとうございます！ 記念すべき初カキコですね♪',
+      'ようこそキリ番報告BBSへ！ 初めての報告を歓迎します！'
+    ],
+    second: [
+      '前回に引き続き、報告ありがとうございます！',
+      'おおっ、早くも2回目のキリ番報告ですね！',
+      '再びのキリ番GET、おめでとうございます！'
+    ],
+    regular: [
+      'いつもキリ番報告ありがとうございます！',
+      '今回も報告ありがとうございます！ すっかり常連さんですね♪',
+      'またまた見事なキリ番GET！ いつも感謝です！'
+    ]
+  };
+
+  const seedPosts = [
+    {id:'seed1',name:'関数好き',message:'一次関数ゲームやりました。30秒切れた！',number:null,date:'2026/11/17 18:42',reply:'30秒切り、お見事です！ その調子で疾風迅雷の一次関数マスターを目指してください♪',pending:false},
+    {id:'seed2',name:'Lucky Seven',message:'7777番でした！ キリ番じゃないけど、なんか縁起がよさそうなので記念カキコ。',number:7777,date:'2026/11/17 20:16',reply:'7777番とはラッキー感がありますね！ 正式なキリ番ではなくても、これは報告したくなる数字です。',pending:false},
+    {id:'seed3',name:'放物線の民',message:'次の10000番を狙います。あと二次関数のゲーム難しかったです。',number:null,date:'2026/11/18 07:03',reply:'挑戦ありがとうございます！ 放物線のように数学力もぐんぐん上昇するはずです。10000番でまた会いましょう！',pending:false},
+    {id:'seed4',name:'通りすがりの中学生',message:'10000番ねらってたのに9999番でした……惜しい！',number:null,date:'2026/11/18 17:28',reply:'惜しい！！ 9999番はキリ番の一歩手前賞ということで、管理人から拍手を送ります。',pending:false}
+  ];
+
+  const params = new URLSearchParams(location.search);
+  const rawKiriban = params.get('kiriban');
+  const kiriban = /^\d{1,9}$/.test(rawKiriban || '') ? Number(rawKiriban) : null;
+  const banner = document.getElementById('kiribanBanner');
+  const form = document.getElementById('postForm');
+  const nameInput = document.getElementById('nameInput');
+  const messageInput = document.getElementById('messageInput');
+  const charCount = document.getElementById('charCount');
+  const status = document.getElementById('status');
+  const postsEl = document.getElementById('posts');
+
+  function safeParse(key, fallback){
+    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+    catch { return fallback; }
+  }
+  function save(key, value){
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+    catch { return false; }
+  }
+  function escapeHtml(value){
+    return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+  function normalizeName(value){
+    return value.trim().replace(/\s+/g,' ').toLocaleLowerCase('ja-JP');
+  }
+  function choose(list){ return list[Math.floor(Math.random() * list.length)]; }
+  function getNext(number){ return number ? Math.ceil((number + 1) / 10000) * 10000 : '次のキリ番'; }
+  function chooseReplyBody(){
+    const r = Math.random();
+    if(r < .50) return choose(normalReplies);
+    if(r < .75) return choose(heiseiReplies);
+    if(r < .95) return choose(mathReplies);
+    return choose(rareReplies);
+  }
+  function createReply(name, number, count){
+    if(!number){
+      return choose(neutralReplies).replaceAll('{name}', name);
+    }
+    const group = count === 1 ? openingByCount.first : count === 2 ? openingByCount.second : openingByCount.regular;
+    const opening = choose(group);
+    return opening + ' ' + chooseReplyBody()
+      .replaceAll('{name}', name)
+      .replaceAll('{number}', String(number))
+      .replaceAll('{next}', String(getNext(number)));
+  }
+  function nowText(){
+    return new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date()).replaceAll('/','/');
+  }
+
+  let posts = safeParse(STORAGE_POSTS, []);
+  if(!localStorage.getItem(STORAGE_FIRST_OPEN)){
+    posts = [...seedPosts, ...posts];
+    save(STORAGE_POSTS, posts);
+    try { localStorage.setItem(STORAGE_FIRST_OPEN, '1'); } catch {}
+  } else if(posts.length === 0){
+    posts = [...seedPosts];
+    save(STORAGE_POSTS, posts);
+  }
+
+  function renderPosts(){
+    const ordered = [...posts].reverse();
+    postsEl.innerHTML = ordered.map((post, index) => {
+      const no = posts.length - index;
+      const numberLine = post.number ? `<span> ／ キリ番：<strong>${escapeHtml(post.number)}</strong></span>` : '';
+      const reply = post.pending
+        ? `<div class="reply"><div class="reply-head">└ 管理人</div><div class="reply-body waiting">返信をしたためています……</div></div>`
+        : post.reply
+          ? `<div class="reply"><div class="reply-head">└ 管理人</div><div class="reply-body">${escapeHtml(post.reply)}</div></div>`
+          : '';
+      return `<article class="post">
+        <div class="post-head"><span class="post-no">[${no}]</span> 名前：<span class="post-name">${escapeHtml(post.name)}</span>${numberLine} ／ ${escapeHtml(post.date)}</div>
+        <div class="post-body">${escapeHtml(post.message)}</div>
+        ${reply}
+      </article>`;
+    }).join('');
+  }
+
+  if(kiriban){
+    banner.textContent = `★ ${kiriban}番GETおめでとうございます！ ここから記念カキコできます ★`;
+    banner.classList.add('show');
+    messageInput.value = `${kiriban}番を踏みました！`;
+  }
+  charCount.textContent = String(messageInput.value.length);
+  messageInput.addEventListener('input', () => { charCount.textContent = String(messageInput.value.length); });
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const name = (nameInput.value.trim() || '名無しの数学好き').slice(0,20);
+    const message = messageInput.value.trim().slice(0,160);
+    if(!message){ status.textContent = 'メッセージを入力してください。'; messageInput.focus(); return; }
+
+    const counts = safeParse(STORAGE_COUNTS, {});
+    const key = normalizeName(name);
+    const count = (Number(counts[key]) || 0) + 1;
+    counts[key] = count;
+    save(STORAGE_COUNTS, counts);
+
+    const id = 'p' + Date.now() + Math.random().toString(36).slice(2,7);
+    const post = {id,name,message,number:kiriban,date:nowText(),reply:'',pending:true};
+    posts.push(post);
+    save(STORAGE_POSTS, posts);
+    renderPosts();
+    status.textContent = '書き込み完了しますた！ 管理人の返信を待っています……';
+    nameInput.value = '';
+    messageInput.value = '';
+    charCount.textContent = '0';
+    postsEl.scrollIntoView({behavior:'smooth',block:'start'});
+
+    const delay = 1500 + Math.floor(Math.random() * 1501);
+    setTimeout(() => {
+      const target = posts.find(item => item.id === id);
+      if(!target) return;
+      target.pending = false;
+      target.reply = createReply(name, kiriban, count);
+      save(STORAGE_POSTS, posts);
+      renderPosts();
+      status.textContent = '管理人からレスがつきました！';
+    }, delay);
+  });
+
+  renderPosts();
+})();
+</script>
+</body>
+</html>
