@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>数学の館★キリ番報告BBS</title>
+<title>数学の館★キリ番報告BBS（リセット機能付き）</title>
 <style>
   *{box-sizing:border-box}
   html{background:#000066}
@@ -46,14 +46,23 @@
   input,textarea{width:100%;padding:8px;border:3px inset #ccc;background:#fff;font:16px inherit}
   textarea{min-height:92px;resize:vertical}
   .count-row{text-align:right;color:#666;font-size:12px}
-  .submit-button,.back-button,.clear-button{
+  .submit-button,.back-button,.clear-button,.reset-button,.portal-button{
     display:inline-block;margin:8px 4px 0;padding:8px 15px;border:4px outset #fff;
     font:bold 15px inherit;text-decoration:none;cursor:pointer
   }
   .submit-button{color:#fff;background:linear-gradient(#ff3399,#990066)}
   .back-button{color:#000;background:#ffff66}
   .clear-button{color:#fff;background:#666;font-size:12px;padding:5px 9px}
-  button:active,.back-button:active{border-style:inset}
+    .form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+    .reset-button{color:#fff;background:linear-gradient(#777,#333);font-size:13px}
+    .reset-button.confirm-stage{background:linear-gradient(#ff3333,#990000);animation:resetBlink .7s steps(2,end) infinite}
+    .reset-confirm-dock{display:none;margin-top:8px;padding:8px;text-align:right;border:3px dashed #cc0000;background:#fff0f0}
+    .reset-confirm-dock.show{display:block}
+    .reset-warning{display:block;margin-bottom:4px;color:#990000;font-weight:bold;font-size:13px}
+    .portal-row{margin-top:12px;text-align:center}
+    .portal-button{color:#000;background:#ffff66}
+    @keyframes resetBlink{50%{filter:brightness(1.45)}}
+  button:active,.back-button:active,.portal-button:active{border-style:inset}
   .status{min-height:1.6em;margin-top:5px;color:#cc0000;font-weight:bold;text-align:center}
   .thread-title{margin:14px 0 6px;padding:6px;text-align:center;color:#ffff00;background:#990066;border:4px outset #ff99cc;font-weight:bold}
   .post{margin:8px 0;border:2px solid #6699cc;background:#eefaff}
@@ -67,7 +76,7 @@
   .waiting{color:#777;font-style:italic}
   footer{margin-top:14px;padding:8px;text-align:center;color:#fff;background:#000080;font-size:12px}
   .tiny{font-size:11px;color:#555}
-  @media(max-width:480px){.page{width:100%;margin:0;border-width:4px}.reply{margin-left:15px}.submit-button,.back-button{width:100%;margin:5px 0}}
+  @media(max-width:480px){.page{width:100%;margin:0;border-width:4px}.reply{margin-left:15px}.form-actions{display:grid;grid-template-columns:1fr 1fr}.submit-button,.reset-button{width:100%;margin:5px 0}.reset-confirm-dock{text-align:center}.portal-button{width:100%;margin:5px 0}}
   @media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -99,8 +108,13 @@
       <textarea id="messageInput" name="message" maxlength="160" required placeholder="キリ番報告やひとことをどうぞ！"></textarea>
       <div class="count-row"><span id="charCount">0</span> / 160文字</div>
 
-      <button class="submit-button" type="submit">★ カキコする ★</button>
-      <a class="back-button" href="https://mathmachine0725.github.io/Math_portal/">ポータルへ戻る</a>
+      <div id="formActions" class="form-actions">
+        <button class="submit-button" type="submit">★ カキコする ★</button>
+        <button id="resetButton" class="reset-button" type="button">投稿をリセット</button>
+      </div>
+      <div id="resetConfirmDock" class="reset-confirm-dock">
+        <span class="reset-warning">本当にリセットしますか？ 元には戻せません。</span>
+      </div>
       <div id="status" class="status" role="status" aria-live="polite"></div>
     </form>
   </section>
@@ -109,6 +123,9 @@
   <main id="posts" aria-live="polite"></main>
 
   <p class="tiny">※投稿と返信は、同じ端末・同じブラウザでのみ表示されます。別の人の端末とは共有されません。</p>
+  <div class="portal-row">
+    <a href="https://mathmachine0725.github.io/Math_portal/index.html" class="portal-button">← ポータルサイトへ戻る</a>
+  </div>
   <footer>
     数学の館・キリ番報告BBS<br>
     Since 2026 / 管理人：数学の館管理人
@@ -222,6 +239,10 @@
   const charCount = document.getElementById('charCount');
   const status = document.getElementById('status');
   const postsEl = document.getElementById('posts');
+  const resetButton = document.getElementById('resetButton');
+  const formActions = document.getElementById('formActions');
+  const resetConfirmDock = document.getElementById('resetConfirmDock');
+  let resetStage = 0;
 
   function safeParse(key, fallback){
     try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -332,12 +353,42 @@
     }, delay);
   });
 
+  resetButton.addEventListener('click', () => {
+    if(resetStage === 0){
+      resetStage = 1;
+      resetButton.textContent = '本当にリセットする';
+      resetButton.classList.add('confirm-stage');
+      resetConfirmDock.classList.add('show');
+      resetConfirmDock.appendChild(resetButton);
+      status.textContent = '確認1回目：リセットボタンを移動しました。もう一度押すと最終確認が出ます。';
+      return;
+    }
+    const finalAnswer = confirm('最終確認です。あなたが追加した投稿と名前ごとの回数をリセットします。よろしいですか？');
+    if(!finalAnswer){
+      resetStage = 0;
+      resetButton.textContent = '投稿をリセット';
+      resetButton.classList.remove('confirm-stage');
+      resetConfirmDock.classList.remove('show');
+      formActions.appendChild(resetButton);
+      status.textContent = 'リセットをキャンセルしました。';
+      return;
+    }
+    posts = [...seedPosts];
+    save(STORAGE_POSTS, posts);
+    save(STORAGE_COUNTS, {});
+    try { localStorage.setItem(STORAGE_FIRST_OPEN, '1'); } catch {}
+    renderPosts();
+    resetStage = 0;
+    resetButton.textContent = '投稿をリセット';
+    resetButton.classList.remove('confirm-stage');
+    resetConfirmDock.classList.remove('show');
+    formActions.appendChild(resetButton);
+    status.textContent = '投稿を初期状態に戻しました。';
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
   renderPosts();
 })();
 </script>
- <a href="https://mathmachine0725.github.io/Math_portal/index.html" class="portal-button">
-← ポータルサイトへ戻る
-</a>
 </body>
 </html>
 
