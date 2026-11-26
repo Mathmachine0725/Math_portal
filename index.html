@@ -322,6 +322,21 @@
   @keyframes challengePop{from{transform:scale(.6)}to{transform:scale(1)}}
   .lottery-note{margin:5px 0 0;color:#990066;font-size:12px;font-weight:bold}
 
+  /* おみくじ結果：運勢の文字だけに効果を付ける */
+  .lottery-result{display:block;width:100%;line-height:1.55}
+  .lottery-game{display:block;margin-bottom:5px;color:#000066;font-size:clamp(16px,4vw,21px);font-weight:bold}
+  .fortune{display:inline-block;margin:3px 0 7px;padding:4px 15px;border-radius:10px;font-size:clamp(25px,7vw,34px);font-weight:bold;line-height:1.2}
+  .fortune-comment{display:block;color:#660033;font-size:clamp(13px,3.8vw,16px);font-weight:bold}
+  .fortune-daikichi{color:#d60000;background:linear-gradient(135deg,#fff3a0,#fff,#ffd700);border:4px double #d60000;text-shadow:0 0 5px #fff,0 0 11px #ffd700;animation:daikichiGlow .8s ease-in-out infinite alternate}
+  .fortune-chukichi{color:#d35400;background:#fff3cd;border:3px solid #f39c12;text-shadow:1px 1px #fff}
+  .fortune-shokichi{color:#006837;background:#e7f8e7;border:3px solid #34a853}
+  .fortune-kichi{color:#145da0;background:#e6f4ff;border:3px solid #368bd6}
+  .fortune-kyo{color:#5b21b6;background:#f1e8ff;border:3px solid #7c3aed}
+  .fortune-daikyo{color:#fff;background:linear-gradient(135deg,#111,#670000);border:4px double #ff3333;text-shadow:0 0 9px #f00;animation:daikyoShake .22s linear 4}
+  @keyframes daikichiGlow{from{transform:scale(1);filter:brightness(1)}to{transform:scale(1.08);filter:brightness(1.2)}}
+  @keyframes daikyoShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-3px)}}
+  @media(prefers-reduced-motion:reduce){.fortune{animation:none}}
+
   /* キリ番報告ボタン */
   .kiriban-bbs{display:inline-block;margin:5px;padding:10px 18px;color:#fff;background:linear-gradient(#00aaff,#0033cc);border:5px outset #fff;font:bold 17px "MS PGothic",sans-serif;text-decoration:none}
   .kiriban-bbs:active{border-style:inset}
@@ -584,6 +599,16 @@
     {title:'y=a(x-p)² の四択問題！',url:'https://mathmachine0725.github.io/ZAHYOU/square_grid_a(x-p)%5E2.html'},
     {title:'y=a(x-p)²+qの頂点を当てろ！',url:'https://mathmachine0725.github.io/ZAHYOU/parabola_vertex_tap.html'}
   ];
+
+  /* おみくじ。現在は6種類を同じ確率で抽選 */
+  const fortunes = [
+    {name:'大吉',className:'fortune-daikichi',comment:'絶好調！この勢いで新記録を目指そう！'},
+    {name:'中吉',className:'fortune-chukichi',comment:'かなり良い調子！落ち着いて挑戦しよう！'},
+    {name:'小吉',className:'fortune-shokichi',comment:'小さな一歩が大記録につながるかも！'},
+    {name:'吉',className:'fortune-kichi',comment:'練習すれば運気も実力も上昇するぞ！'},
+    {name:'凶',className:'fortune-kyo',comment:'こんな日こそ練習日和！問題に挑戦して運気を変えよう！'},
+    {name:'大凶',className:'fortune-daikyo',comment:'問題に挑戦して大凶を大吉にしちゃおう！'}
+  ];
   const lotteryButton=document.getElementById('lotteryButton');
   const slotWindow=document.getElementById('slotWindow');
   const challengeGo=document.getElementById('challengeGo');
@@ -602,9 +627,17 @@
         if(count>=20){
           clearInterval(slotTimer);
           const selected=challenges[Math.floor(Math.random()*challenges.length)];
+          const fortune=fortunes[Math.floor(Math.random()*fortunes.length)];
           slotWindow.classList.remove('spinning');
-          slotWindow.textContent=`★ ${selected.title} に決定！ ★`;
+          slotWindow.innerHTML=`
+            <span class="lottery-result">
+              <span class="lottery-game">★ ${selected.title} ★</span>
+              <span class="fortune ${fortune.className}">${fortune.name}</span>
+              <span class="fortune-comment">${selected.title}に挑戦！<br>${fortune.comment}</span>
+            </span>`;
           challengeGo.href=selected.url;
+          challengeGo.target='_blank';
+          challengeGo.rel='noopener noreferrer';
           challengeGo.classList.add('show');
           lotteryButton.disabled=false;
           lotteryButton.textContent='★ もう一度引く！ ★';
